@@ -49,7 +49,8 @@ public class SecurityConfig {
                         .addFilterBefore(exceptionHandlerFilter, UsernamePasswordAuthenticationFilter.class)
                         .exceptionHandling(Customizer.withDefaults())
                         .authorizeHttpRequests(c ->
-                                c.requestMatchers("/admin/metrics/**").hasAuthority("ADMIN"))
+                                c.requestMatchers("/admin/metrics/**").hasAuthority("ADMIN")
+                                        .requestMatchers("/tasks/**").hasAuthority("ADMIN"))
                         .cors(Customizer.withDefaults())
                         .csrf(csrf -> csrf.disable())
                         .logout(c -> c.invalidateHttpSession(true)

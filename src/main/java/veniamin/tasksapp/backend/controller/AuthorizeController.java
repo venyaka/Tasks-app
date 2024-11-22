@@ -1,6 +1,8 @@
 package veniamin.tasksapp.backend.controller;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import veniamin.tasksapp.backend.constant.PathConstants;
 import veniamin.tasksapp.backend.dto.request.RegisterReqDTO;
 import veniamin.tasksapp.backend.dto.request.UserAuthorizeReqDTO;
@@ -12,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import veniamin.tasksapp.backend.utils.LogsUtils;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthorizeController {
 
     private final AuthorizeService authorizeService;
+
 
     @PostMapping("/login")
     public ResponseEntity<TokenRespDTO> authorizeUser(@Valid @RequestBody UserAuthorizeReqDTO userAuthorizeDTO) {

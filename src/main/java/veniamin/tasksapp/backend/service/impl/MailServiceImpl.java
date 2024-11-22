@@ -44,7 +44,7 @@ public class MailServiceImpl implements MailService {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
         String content = MailUtils.ACCOUNT_VERIFY_TEMPLATE;
-        String link = UrlPathUtility.getSiteUrl(request) + "/verification?email=@EMAIL@&token=@TOKEN@";
+        String link = UrlPathUtility.getSiteUrl(request) + "/authorize/verification?email=@EMAIL@&token=@TOKEN@";
         link = link.replace(tokenReplaceString, user.getToken());
         link = link.replace(emailReplaceString, user.getEmail());
         content = content.replace(MailUtils.LINK, link);

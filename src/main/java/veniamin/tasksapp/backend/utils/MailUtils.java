@@ -2,7 +2,7 @@ package veniamin.tasksapp.backend.utils;
 
 public class MailUtils {
 
-    public static final String ACCOUNT_VERIFY_HEADER = "Верификация аккаунта TaskPlanner";
+    public static final String ACCOUNT_VERIFY_HEADER = "Верификация аккаунта Tasks-App";
 
     public static final String ACCOUNT_CHANGE_PASSWORD_HEADER = "Изменение пароля аккаунта TaskPlanner";
 

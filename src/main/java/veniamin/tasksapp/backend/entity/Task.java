@@ -7,7 +7,9 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -33,19 +35,25 @@ public class Task {
     @Column
     private boolean status;
 
-    @OneToMany
+    @Column
+    private String priority;
+
+    @Column
+    private String comment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "performer_id", referencedColumnName = "id")
-    private Set<User> performers = new HashSet<>();
+    private User performer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", referencedColumnName = "id")
     private User creator;
 
-    @PrePersist
-    public void prePersist() {
-        this.date = LocalDate.now().plusDays(1);
-        this.status = Boolean.FALSE;
-    }
+//    @PrePersist
+//    public void prePersist() {
+//        this.date = LocalDate.now().plusDays(1);
+//        this.status = Boolean.FALSE;
+//    }
 
     @Override
     public boolean equals(Object obj) {

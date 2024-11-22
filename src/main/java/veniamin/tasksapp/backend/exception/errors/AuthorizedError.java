@@ -12,6 +12,8 @@ public enum AuthorizedError {
 
     USER_WITH_THIS_EMAIL_NOT_FOUND("Пользователь с данным email не найден в системе"),
 
+    TASK_NOT_FOUND("Задача не найден в системе"),
+
     NOT_CORRECT_PASSWORD("Неверный пароль"),
 
     USER_IS_DELETED("Пользователь удален"),

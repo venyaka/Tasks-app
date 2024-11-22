@@ -73,8 +73,6 @@ public class User implements UserDetails {
         this.isDeleted = Boolean.FALSE;
         this.isEmailVerificated = Boolean.FALSE;
         this.dateCreate = LocalDateTime.now();
-//        this.basket = new Basket();
-//        this.basket.setUser(this);
         this.isSuspicious = Boolean.FALSE;
         if (roles.isEmpty()) {
             roles.add(Role.USER);
