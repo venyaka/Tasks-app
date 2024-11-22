@@ -1,5 +1,6 @@
 package veniamin.tasksapp.backend.configuration;
 
+import org.springframework.http.HttpMethod;
 import veniamin.tasksapp.backend.filter.ExceptionHandlerFilter;
 import veniamin.tasksapp.backend.filter.RefreshTokenFilter;
 import veniamin.tasksapp.backend.filter.jwt.JwtTokenFilter;
@@ -17,6 +18,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 
 @Configuration
@@ -50,7 +53,10 @@ public class SecurityConfig {
                         .exceptionHandling(Customizer.withDefaults())
                         .authorizeHttpRequests(c ->
                                 c.requestMatchers("/admin/metrics/**").hasAuthority("ADMIN")
-                                        .requestMatchers("/tasks/**").hasAuthority("ADMIN"))
+                                        .requestMatchers(antMatcher(HttpMethod.GET, "/tasks/**")).hasAuthority("USER")
+                                        .requestMatchers(antMatcher("/tasks/**")).hasAuthority("ADMIN"))
+
+
                         .cors(Customizer.withDefaults())
                         .csrf(csrf -> csrf.disable())
                         .logout(c -> c.invalidateHttpSession(true)
