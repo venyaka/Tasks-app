@@ -58,6 +58,4 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 || request.getRequestURI().startsWith("/swagger")
                 || request.getRequestURI().startsWith("/v3/api-docs");
     }
-
-
 }

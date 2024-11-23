@@ -1,6 +1,7 @@
 package veniamin.tasksapp.backend.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import veniamin.tasksapp.backend.constant.PathConstants;
@@ -25,6 +26,9 @@ public class AuthorizeController {
 
 
     @PostMapping("/login")
+    @Operation(summary = "Ендпоинт для авторизации, принимает два request body с  - email и  password, " +
+            "в которых хранится email и пароль соответственно, " +
+            "возвращает response с header'ом Authorization в формате Bearer jwtTokenInStringFormat и refreshToken в том же формате")
     public ResponseEntity<TokenRespDTO> authorizeUser(@Valid @RequestBody UserAuthorizeReqDTO userAuthorizeDTO) {
         return authorizeService.authorizeUser(userAuthorizeDTO);
     }

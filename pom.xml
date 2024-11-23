@@ -32,6 +32,7 @@
         <jwt.version>0.10.7</jwt.version>
         <model-mapper.version>3.0.0</model-mapper.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <springdoc-openapi-ui.version>2.3.0</springdoc-openapi-ui.version>
     </properties>
     <dependencies>
         <dependency>
@@ -123,7 +124,11 @@
             <scope>runtime</scope>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc-openapi-ui.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

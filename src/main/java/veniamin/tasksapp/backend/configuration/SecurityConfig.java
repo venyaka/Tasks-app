@@ -53,8 +53,8 @@ public class SecurityConfig {
                         .exceptionHandling(Customizer.withDefaults())
                         .authorizeHttpRequests(c ->
                                 c.requestMatchers("/admin/metrics/**").hasAuthority("ADMIN")
-                                        .requestMatchers(antMatcher(HttpMethod.GET, "/tasks/**")).hasAuthority("USER")
-                                        .requestMatchers(antMatcher("/tasks/**")).hasAuthority("ADMIN"))
+                                        .requestMatchers(antMatcher(HttpMethod.GET, "/tasks/**")).authenticated()
+                                        .requestMatchers("/tasks/**").hasAuthority("ADMIN"))
 
 
                         .cors(Customizer.withDefaults())
