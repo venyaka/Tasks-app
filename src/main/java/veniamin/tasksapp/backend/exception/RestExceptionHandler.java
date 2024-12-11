@@ -1,9 +1,9 @@
 package veniamin.tasksapp.backend.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import veniamin.tasksapp.backend.dto.responce.BusinessExceptionRespDTO;
-import veniamin.tasksapp.backend.dto.responce.ConstraintFailRespDTO;
-import veniamin.tasksapp.backend.dto.responce.ValidationExceptionRespDTO;
+import veniamin.tasksapp.backend.dto.response.BusinessExceptionRespDTO;
+import veniamin.tasksapp.backend.dto.response.ConstraintFailRespDTO;
+import veniamin.tasksapp.backend.dto.response.ValidationExceptionRespDTO;
 import veniamin.tasksapp.backend.utils.LogsUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

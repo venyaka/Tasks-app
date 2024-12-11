@@ -2,7 +2,7 @@ package veniamin.tasksapp.backend.service.impl;
 
 import veniamin.tasksapp.backend.configuration.RestTemplateConfig;
 import veniamin.tasksapp.backend.constant.IpAddressesConstant;
-import veniamin.tasksapp.backend.dto.responce.IpStackResponse;
+import veniamin.tasksapp.backend.dto.response.IpStackResponse;
 import veniamin.tasksapp.backend.exception.NotFoundException;
 import veniamin.tasksapp.backend.exception.errors.NotFoundError;
 import veniamin.tasksapp.backend.entity.User;

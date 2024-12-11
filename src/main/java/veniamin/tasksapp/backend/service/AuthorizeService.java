@@ -3,10 +3,9 @@ package veniamin.tasksapp.backend.service;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import veniamin.tasksapp.backend.dto.request.RegisterReqDTO;
 import veniamin.tasksapp.backend.dto.request.UserAuthorizeReqDTO;
-import veniamin.tasksapp.backend.dto.responce.TokenRespDTO;
+import veniamin.tasksapp.backend.dto.response.TokenRespDTO;
 
 public interface AuthorizeService {
 

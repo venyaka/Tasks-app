@@ -20,7 +20,4 @@ public class TaskCreateReqDTO {
     private LocalDate date;
 
     private String performerEmail;
-
-    @NotBlank
-    private String creatorEmail;
 }
