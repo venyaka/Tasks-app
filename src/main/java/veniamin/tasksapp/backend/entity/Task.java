@@ -6,11 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "tasks")
@@ -33,7 +28,7 @@ public class Task {
     private LocalDate date;
 
     @Column
-    private boolean status;
+    private Boolean isComplete;
 
     @Column
     private String priority;

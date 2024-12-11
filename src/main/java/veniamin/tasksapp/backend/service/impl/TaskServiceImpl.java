@@ -1,22 +1,29 @@
 package veniamin.tasksapp.backend.service.impl;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+//import veniamin.tasksapp.backend.configuration.mapstruct.TaskToTaskRespDTO;
+import veniamin.tasksapp.backend.configuration.mapstruct.TaskToTaskRespDTO;
+import veniamin.tasksapp.backend.dto.response.TaskRespDTO;
 import veniamin.tasksapp.backend.dto.request.task.TaskCreateReqDTO;
 import veniamin.tasksapp.backend.dto.request.task.TaskUpdateReqDTO;
 import veniamin.tasksapp.backend.entity.Task;
 import veniamin.tasksapp.backend.entity.User;
-import veniamin.tasksapp.backend.exception.BadRequestException;
+import veniamin.tasksapp.backend.exception.NotFoundException;
 import veniamin.tasksapp.backend.exception.errors.AuthorizedError;
-import veniamin.tasksapp.backend.exception.errors.BadRequestError;
+import veniamin.tasksapp.backend.exception.errors.NotFoundError;
 import veniamin.tasksapp.backend.repository.TaskRepository;
 import veniamin.tasksapp.backend.repository.UserRepository;
 import veniamin.tasksapp.backend.service.TaskService;
-import veniamin.tasksapp.backend.service.UserService;
 import veniamin.tasksapp.backend.utils.LogsUtils;
 
 import java.util.List;
@@ -34,20 +41,18 @@ public class TaskServiceImpl implements TaskService {
 
     private static final Logger loggerAuth = LoggerFactory.getLogger("authLogger");
 
+    private final TaskToTaskRespDTO taskToTaskRespDTO;
 
     @Override
+    @Transactional
     public void createTask(TaskCreateReqDTO createTaskDTO, HttpServletRequest request) {
-        Optional<User> optionalCreator = userRepository.findByEmail(createTaskDTO.getCreatorEmail());
-        if (optionalCreator.isEmpty()) {
-            throw new BadCredentialsException(AuthorizedError.USER_WITH_THIS_EMAIL_NOT_FOUND.getMessage());
-        }
+        User creator = getCurrentUser();
 
         Optional<User> optionalPerformer = userRepository.findByEmail(createTaskDTO.getPerformerEmail());
         if (optionalPerformer.isEmpty()) {
             throw new BadCredentialsException(AuthorizedError.USER_WITH_THIS_EMAIL_NOT_FOUND.getMessage());
         }
 
-        User creator = optionalCreator.get();
         User performer = optionalPerformer.get();
 
         Task task = new Task();
@@ -56,7 +61,7 @@ public class TaskServiceImpl implements TaskService {
         task.setComment(createTaskDTO.getComment());
         task.setPriority(createTaskDTO.getPriority());
         task.setDate(createTaskDTO.getDate());
-        task.setStatus(Boolean.FALSE);
+        task.setIsComplete(Boolean.FALSE);
         task.setPerformer(performer);
         task.setCreator(creator);
         taskRepository.save(task);
@@ -72,39 +77,59 @@ public class TaskServiceImpl implements TaskService {
             throw new BadCredentialsException(AuthorizedError.TASK_NOT_FOUND.getMessage());
         }
 
-        Optional<User> optionalCreator = userRepository.findByEmail(updateTaskDTO.getCreatorEmail());
-        if (optionalCreator.isEmpty()) {
-            throw new BadCredentialsException(AuthorizedError.USER_WITH_THIS_EMAIL_NOT_FOUND.getMessage());
-        }
-
-        Optional<User> optionalPerformer = userRepository.findByEmail(updateTaskDTO.getPerformerEmail());
-        if (optionalPerformer.isEmpty()) {
-            throw new BadCredentialsException(AuthorizedError.USER_WITH_THIS_EMAIL_NOT_FOUND.getMessage());
-        }
-
-        User creator = optionalCreator.get();
-        User performer = optionalPerformer.get();
-
         Task task = optionalTask.get();
-        task.setTitle(updateTaskDTO.getTitle());
-        task.setDetails(updateTaskDTO.getDetails());
-        task.setComment(updateTaskDTO.getComment());
-        task.setPriority(updateTaskDTO.getPriority());
-        task.setDate(updateTaskDTO.getDate());
-        task.setPerformer(performer);
-        task.setCreator(creator);
+        if (updateTaskDTO.getTitle() != null) task.setTitle(updateTaskDTO.getTitle());
+        if (updateTaskDTO.getDetails() != null) task.setDetails(updateTaskDTO.getDetails());
+        if (updateTaskDTO.getComment() != null) task.setComment(updateTaskDTO.getComment());
+        if (updateTaskDTO.getPriority() != null) task.setPriority(updateTaskDTO.getPriority());
+        if (updateTaskDTO.getDate() != null) task.setDate(updateTaskDTO.getDate());
+
+        taskRepository.save(task);
+
+        if (updateTaskDTO.getPerformerEmail() != null) {
+            Optional<User> optionalPerformer = userRepository.findByEmail(updateTaskDTO.getPerformerEmail());
+            if (optionalPerformer.isEmpty()) {
+                throw new BadCredentialsException(AuthorizedError.USER_WITH_THIS_EMAIL_NOT_FOUND.getMessage());
+            }
+            task.setPerformer(optionalPerformer.get());
+        }
+
         taskRepository.save(task);
 
         logsUtils.log(loggerAuth, "Create task - " + updateTaskDTO.getTitle());
     }
 
     @Override
-    public List<Task> getAllTask() {
-        return taskRepository.findAll();
+    @Transactional
+    public Page<TaskRespDTO> findAllTask(Pageable pageable) {
+        User user = getCurrentUser();
+
+//        List<Task> tasks = taskRepository.findAll()
+//                .stream().filter(m -> !m.getPerformer().equals(user) && !m.getIsComplete()).toList();
+
+        List<Task> tasks = taskRepository.findAll();
+
+        Page<Task> page = new PageImpl<>(tasks, pageable, tasks.size());
+
+        return page.map(taskToTaskRespDTO::sourceToDestination);
     }
+
+
+//    @Override
+//    public List<Task> getAllTask(Pageable pageable) {
+//
+//        return taskRepository.findAll();
+//    }
 
     @Override
     public List<Task> getTask(Long amount, HttpServletRequest request) {
         return taskRepository.findAll();
+    }
+
+    @Transactional
+    protected User getCurrentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(NotFoundError.USER_NOT_FOUND));
     }
 }

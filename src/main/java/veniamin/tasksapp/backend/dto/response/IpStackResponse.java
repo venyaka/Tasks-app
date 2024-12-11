@@ -1,4 +1,4 @@
-package veniamin.tasksapp.backend.dto.responce;
+package veniamin.tasksapp.backend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class TaskStatusChangeReqDTO {
 
-    private boolean status;
+    private Boolean isComplete;
 }

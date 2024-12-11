@@ -1,12 +1,11 @@
-package veniamin.tasksapp.backend.dto.responce;
+package veniamin.tasksapp.backend.dto.response;
 
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
-public class ValidationExceptionRespDTO {
+public class BusinessExceptionRespDTO {
 
     private LocalDateTime timestamp;
 
@@ -19,6 +18,4 @@ public class ValidationExceptionRespDTO {
     private String path;
 
     private String debugInfo;
-
-    private List<ConstraintFailRespDTO> constraintFailRespDTOList;
 }

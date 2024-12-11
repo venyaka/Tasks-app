@@ -1,7 +1,7 @@
 package veniamin.tasksapp.backend.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import veniamin.tasksapp.backend.dto.responce.BusinessExceptionRespDTO;
+import veniamin.tasksapp.backend.dto.response.BusinessExceptionRespDTO;
 import veniamin.tasksapp.backend.exception.AuthorizeException;
 import veniamin.tasksapp.backend.exception.BadRequestException;
 import veniamin.tasksapp.backend.exception.NotFoundException;

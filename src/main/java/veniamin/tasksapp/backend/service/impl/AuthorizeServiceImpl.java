@@ -2,7 +2,7 @@ package veniamin.tasksapp.backend.service.impl;
 
 import veniamin.tasksapp.backend.dto.request.RegisterReqDTO;
 import veniamin.tasksapp.backend.dto.request.UserAuthorizeReqDTO;
-import veniamin.tasksapp.backend.dto.responce.TokenRespDTO;
+import veniamin.tasksapp.backend.dto.response.TokenRespDTO;
 import veniamin.tasksapp.backend.exception.BadRequestException;
 import veniamin.tasksapp.backend.exception.NotFoundException;
 import veniamin.tasksapp.backend.exception.errors.AuthorizedError;
