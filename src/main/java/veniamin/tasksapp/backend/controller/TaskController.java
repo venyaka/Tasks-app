@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import veniamin.tasksapp.backend.constant.PathConstants;
+import veniamin.tasksapp.backend.dto.request.task.TaskCommentChangeReqDTO;
+import veniamin.tasksapp.backend.dto.request.task.TaskStatusChangeReqDTO;
 import veniamin.tasksapp.backend.dto.request.task.TaskUpdateReqDTO;
 import veniamin.tasksapp.backend.dto.response.TaskRespDTO;
 import veniamin.tasksapp.backend.entity.Task;
@@ -34,6 +36,18 @@ public class TaskController {
     @Operation(summary = "Редактирование существующей задачи, досуп имеет только admin")
     public void updateTask(@Valid @RequestBody TaskUpdateReqDTO updateTaskDTO, HttpServletRequest request){
         taskService.updateTask(updateTaskDTO, request);
+    }
+
+    @PatchMapping("/edit-status")
+    @Operation(summary = "Редактирование статуса задачи, досуп имеет как admin так и пользователь")
+    public void updateTaskStatus(@Valid @RequestBody TaskStatusChangeReqDTO updateTaskStatusDTO, HttpServletRequest request){
+        taskService.updateTaskStatus(updateTaskStatusDTO, request);
+    }
+
+    @PatchMapping("/edit-comment")
+    @Operation(summary = "Редактирование комментария к задаче, досуп имеет как admin так и пользователь")
+    public void updateTaskComment(@Valid @RequestBody TaskCommentChangeReqDTO updateTaskCommentDTO, HttpServletRequest request){
+        taskService.updateTaskComment(updateTaskCommentDTO, request);
     }
 
     @GetMapping()

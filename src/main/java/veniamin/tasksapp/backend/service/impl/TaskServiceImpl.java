@@ -13,6 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 //import veniamin.tasksapp.backend.configuration.mapstruct.TaskToTaskRespDTO;
 import veniamin.tasksapp.backend.configuration.mapstruct.TaskToTaskRespDTO;
+import veniamin.tasksapp.backend.dto.request.task.TaskCommentChangeReqDTO;
+import veniamin.tasksapp.backend.dto.request.task.TaskStatusChangeReqDTO;
 import veniamin.tasksapp.backend.dto.response.TaskRespDTO;
 import veniamin.tasksapp.backend.dto.request.task.TaskCreateReqDTO;
 import veniamin.tasksapp.backend.dto.request.task.TaskUpdateReqDTO;
@@ -100,6 +102,38 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public void updateTaskStatus(TaskStatusChangeReqDTO updateTaskStatusDTO, HttpServletRequest request) {
+
+        Optional<Task> optionalTask = taskRepository.findById(updateTaskStatusDTO.getId());
+        if (optionalTask.isEmpty()) {
+            throw new BadCredentialsException(AuthorizedError.TASK_NOT_FOUND.getMessage());
+        }
+
+        Task task = optionalTask.get();
+        task.setIsComplete(updateTaskStatusDTO.getIsComplete());
+        taskRepository.save(task);
+
+        logsUtils.log(loggerAuth, "Update status task - " + updateTaskStatusDTO.getIsComplete());
+    }
+
+    @Override
+    public void updateTaskComment(TaskCommentChangeReqDTO updateTaskCommentDTO, HttpServletRequest request) {
+
+        Optional<Task> optionalTask = taskRepository.findById(updateTaskCommentDTO.getId());
+        if (optionalTask.isEmpty()) {
+            throw new BadCredentialsException(AuthorizedError.TASK_NOT_FOUND.getMessage());
+        }
+
+        if (updateTaskCommentDTO.getComment() != null) {
+            Task task = optionalTask.get();
+            task.setComment(updateTaskCommentDTO.getComment());
+            taskRepository.save(task);
+        }
+
+        logsUtils.log(loggerAuth, "Update comment task - " + updateTaskCommentDTO.getComment());
+    }
+
+    @Override
     @Transactional
     public Page<TaskRespDTO> findAllTask(Pageable pageable) {
         User user = getCurrentUser();
@@ -113,13 +147,6 @@ public class TaskServiceImpl implements TaskService {
 
         return page.map(taskToTaskRespDTO::sourceToDestination);
     }
-
-
-//    @Override
-//    public List<Task> getAllTask(Pageable pageable) {
-//
-//        return taskRepository.findAll();
-//    }
 
     @Override
     public List<Task> getTask(Long amount, HttpServletRequest request) {

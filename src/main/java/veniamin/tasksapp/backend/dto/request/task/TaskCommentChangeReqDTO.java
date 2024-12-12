@@ -4,11 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class TaskStatusChangeReqDTO {
+public class TaskCommentChangeReqDTO {
 
     @NotBlank
     private Long id;
 
-    @NotBlank
-    private Boolean isComplete;
+    private String comment;
 }
