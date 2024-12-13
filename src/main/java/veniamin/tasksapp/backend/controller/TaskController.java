@@ -6,16 +6,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import veniamin.tasksapp.backend.constant.PathConstants;
-import veniamin.tasksapp.backend.dto.request.task.TaskCommentChangeReqDTO;
-import veniamin.tasksapp.backend.dto.request.task.TaskStatusChangeReqDTO;
-import veniamin.tasksapp.backend.dto.request.task.TaskUpdateReqDTO;
+import veniamin.tasksapp.backend.dto.request.task.*;
 import veniamin.tasksapp.backend.dto.response.TaskRespDTO;
 import veniamin.tasksapp.backend.entity.Task;
 import veniamin.tasksapp.backend.service.TaskService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import veniamin.tasksapp.backend.dto.request.task.TaskCreateReqDTO;
 
 import java.util.List;
 
@@ -54,6 +51,18 @@ public class TaskController {
     @Operation(summary = "Получение всех задач")
     public Page<TaskRespDTO> getAllTask(@PageableDefault Pageable pageable){
         return taskService.findAllTask(pageable);
+    }
+
+    @GetMapping("/get-task-by-creator")
+    @Operation(summary = "Получение всех задач")
+    public Page<TaskRespDTO> getAllTaskByCreator(@Valid @RequestBody FindTaskByCreatorReqDTO findTaskDTO, @PageableDefault Pageable pageable){
+        return taskService.findAllTaskByCreator(findTaskDTO, pageable);
+    }
+
+    @GetMapping("/get-task-by-performer")
+    @Operation(summary = "Получение всех задач")
+    public Page<TaskRespDTO> getAllTaskByPerformer(@Valid @RequestBody FindTaskByPerformerReqDTO findTaskDTO, @PageableDefault Pageable pageable){
+        return taskService.findAllTaskByPerformer(findTaskDTO, pageable);
     }
 
     @GetMapping("/{task}")

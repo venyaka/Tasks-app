@@ -13,11 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 //import veniamin.tasksapp.backend.configuration.mapstruct.TaskToTaskRespDTO;
 import veniamin.tasksapp.backend.configuration.mapstruct.TaskToTaskRespDTO;
-import veniamin.tasksapp.backend.dto.request.task.TaskCommentChangeReqDTO;
-import veniamin.tasksapp.backend.dto.request.task.TaskStatusChangeReqDTO;
+import veniamin.tasksapp.backend.dto.request.task.*;
 import veniamin.tasksapp.backend.dto.response.TaskRespDTO;
-import veniamin.tasksapp.backend.dto.request.task.TaskCreateReqDTO;
-import veniamin.tasksapp.backend.dto.request.task.TaskUpdateReqDTO;
 import veniamin.tasksapp.backend.entity.Task;
 import veniamin.tasksapp.backend.entity.User;
 import veniamin.tasksapp.backend.exception.NotFoundException;
@@ -142,6 +139,30 @@ public class TaskServiceImpl implements TaskService {
 //                .stream().filter(m -> !m.getPerformer().equals(user) && !m.getIsComplete()).toList();
 
         List<Task> tasks = taskRepository.findAll();
+
+        Page<Task> page = new PageImpl<>(tasks, pageable, tasks.size());
+
+        return page.map(taskToTaskRespDTO::sourceToDestination);
+    }
+
+    @Override
+    @Transactional
+    public Page<TaskRespDTO> findAllTaskByCreator(FindTaskByCreatorReqDTO findTaskDTO, Pageable pageable) {
+
+        List<Task> tasks = taskRepository.findAll()
+        .stream().filter(m -> m.getCreator().getEmail().equals(findTaskDTO.getCreatorEmail())).toList();
+
+        Page<Task> page = new PageImpl<>(tasks, pageable, tasks.size());
+
+        return page.map(taskToTaskRespDTO::sourceToDestination);
+    }
+
+    @Override
+    @Transactional
+    public Page<TaskRespDTO> findAllTaskByPerformer(FindTaskByPerformerReqDTO findTaskDTO, Pageable pageable) {
+
+        List<Task> tasks = taskRepository.findAll()
+                .stream().filter(m -> m.getPerformer().getEmail().equals(findTaskDTO.getPerformerEmail())).toList();
 
         Page<Task> page = new PageImpl<>(tasks, pageable, tasks.size());
 
