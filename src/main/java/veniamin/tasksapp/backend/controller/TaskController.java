@@ -65,6 +65,12 @@ public class TaskController {
         return taskService.findAllTaskByPerformer(findTaskDTO, pageable);
     }
 
+    @GetMapping("/{creator}/{performer}")
+    @Operation(summary = "Получение всех задач c выборкой по автору и исполнителю")
+    public Page<TaskRespDTO> getTasks(@PathVariable("creator") String creator, @PathVariable("performer") String performer, @PageableDefault Pageable pageable){
+        return taskService.findTasks(creator, performer, pageable);
+    }
+
     @GetMapping("/{task}")
     @Operation(summary = "Получение одной задачи по id")
     public List<Task> getTask(@PathVariable("task") Long amount, HttpServletRequest request){

@@ -26,5 +26,7 @@ public interface TaskService {
 
     Page<TaskRespDTO> findAllTaskByPerformer(FindTaskByPerformerReqDTO findTaskDTO, Pageable pageable);
 
+    Page<TaskRespDTO> findTasks(String creator, String performer, Pageable pageable);
+
     List<Task> getTask(Long amount, HttpServletRequest request);
 }

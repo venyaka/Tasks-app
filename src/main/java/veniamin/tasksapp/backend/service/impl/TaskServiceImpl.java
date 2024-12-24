@@ -170,6 +170,18 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
+    public Page<TaskRespDTO> findTasks(String creator, String performer, Pageable pageable) {
+
+        List<Task> tasks = taskRepository.findAll()
+                .stream().filter(m -> (m.getPerformer().getEmail().equals(performer) || performer == null) && (m.getCreator().getEmail().equals(creator) || creator == null)).toList();
+
+        Page<Task> page = new PageImpl<>(tasks, pageable, tasks.size());
+
+        return page.map(taskToTaskRespDTO::sourceToDestination);
+    }
+
+    @Override
     public List<Task> getTask(Long amount, HttpServletRequest request) {
         return taskRepository.findAll();
     }
