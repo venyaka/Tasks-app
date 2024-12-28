@@ -47,27 +47,9 @@ public class TaskController {
         taskService.updateTaskComment(updateTaskCommentDTO, request);
     }
 
-    @GetMapping()
-    @Operation(summary = "Получение всех задач")
-    public Page<TaskRespDTO> getAllTask(@PageableDefault Pageable pageable){
-        return taskService.findAllTask(pageable);
-    }
-
-    @GetMapping("/get-task-by-creator")
-    @Operation(summary = "Получение всех задач")
-    public Page<TaskRespDTO> getAllTaskByCreator(@Valid @RequestBody FindTaskByCreatorReqDTO findTaskDTO, @PageableDefault Pageable pageable){
-        return taskService.findAllTaskByCreator(findTaskDTO, pageable);
-    }
-
-    @GetMapping("/get-task-by-performer")
-    @Operation(summary = "Получение всех задач")
-    public Page<TaskRespDTO> getAllTaskByPerformer(@Valid @RequestBody FindTaskByPerformerReqDTO findTaskDTO, @PageableDefault Pageable pageable){
-        return taskService.findAllTaskByPerformer(findTaskDTO, pageable);
-    }
-
-    @GetMapping("/{creator}/{performer}")
+    @GetMapping
     @Operation(summary = "Получение всех задач c выборкой по автору и исполнителю")
-    public Page<TaskRespDTO> getTasks(@PathVariable("creator") String creator, @PathVariable("performer") String performer, @PageableDefault Pageable pageable){
+    public Page<TaskRespDTO> getTasks(@RequestParam(name = "creator", required = false) String creator, @RequestParam(name = "performer", required = false) String performer, @PageableDefault Pageable pageable){
         return taskService.findTasks(creator, performer, pageable);
     }
 

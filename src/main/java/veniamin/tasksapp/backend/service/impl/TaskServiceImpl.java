@@ -132,47 +132,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Page<TaskRespDTO> findAllTask(Pageable pageable) {
-        User user = getCurrentUser();
-
-//        List<Task> tasks = taskRepository.findAll()
-//                .stream().filter(m -> !m.getPerformer().equals(user) && !m.getIsComplete()).toList();
-
-        List<Task> tasks = taskRepository.findAll();
-
-        Page<Task> page = new PageImpl<>(tasks, pageable, tasks.size());
-
-        return page.map(taskToTaskRespDTO::sourceToDestination);
-    }
-
-    @Override
-    @Transactional
-    public Page<TaskRespDTO> findAllTaskByCreator(FindTaskByCreatorReqDTO findTaskDTO, Pageable pageable) {
-
-        List<Task> tasks = taskRepository.findAll()
-        .stream().filter(m -> m.getCreator().getEmail().equals(findTaskDTO.getCreatorEmail())).toList();
-
-        Page<Task> page = new PageImpl<>(tasks, pageable, tasks.size());
-
-        return page.map(taskToTaskRespDTO::sourceToDestination);
-    }
-
-    @Override
-    @Transactional
-    public Page<TaskRespDTO> findAllTaskByPerformer(FindTaskByPerformerReqDTO findTaskDTO, Pageable pageable) {
-
-        List<Task> tasks = taskRepository.findAll()
-                .stream().filter(m -> m.getPerformer().getEmail().equals(findTaskDTO.getPerformerEmail())).toList();
-
-        Page<Task> page = new PageImpl<>(tasks, pageable, tasks.size());
-
-        return page.map(taskToTaskRespDTO::sourceToDestination);
-    }
-
-    @Override
-    @Transactional
     public Page<TaskRespDTO> findTasks(String creator, String performer, Pageable pageable) {
-
         List<Task> tasks = taskRepository.findAll()
                 .stream().filter(m -> (m.getPerformer().getEmail().equals(performer) || performer == null) && (m.getCreator().getEmail().equals(creator) || creator == null)).toList();
 

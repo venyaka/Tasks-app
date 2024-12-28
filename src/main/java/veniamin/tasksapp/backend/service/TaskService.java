@@ -20,12 +20,6 @@ public interface TaskService {
 
     void updateTaskComment(@Valid TaskCommentChangeReqDTO updateTaskCommentDTO, HttpServletRequest request);
 
-    Page<TaskRespDTO> findAllTask(Pageable pageable);
-
-    Page<TaskRespDTO> findAllTaskByCreator(FindTaskByCreatorReqDTO findTaskDTO, Pageable pageable);
-
-    Page<TaskRespDTO> findAllTaskByPerformer(FindTaskByPerformerReqDTO findTaskDTO, Pageable pageable);
-
     Page<TaskRespDTO> findTasks(String creator, String performer, Pageable pageable);
 
     List<Task> getTask(Long amount, HttpServletRequest request);
