@@ -6,16 +6,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import veniamin.tasksapp.backend.constant.PathConstants;
-import veniamin.tasksapp.backend.dto.request.task.TaskCommentChangeReqDTO;
-import veniamin.tasksapp.backend.dto.request.task.TaskStatusChangeReqDTO;
-import veniamin.tasksapp.backend.dto.request.task.TaskUpdateReqDTO;
+import veniamin.tasksapp.backend.dto.request.task.*;
 import veniamin.tasksapp.backend.dto.response.TaskRespDTO;
 import veniamin.tasksapp.backend.entity.Task;
 import veniamin.tasksapp.backend.service.TaskService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import veniamin.tasksapp.backend.dto.request.task.TaskCreateReqDTO;
 
 import java.util.List;
 
@@ -50,10 +47,10 @@ public class TaskController {
         taskService.updateTaskComment(updateTaskCommentDTO, request);
     }
 
-    @GetMapping()
-    @Operation(summary = "Получение всех задач")
-    public Page<TaskRespDTO> getAllTask(@PageableDefault Pageable pageable){
-        return taskService.findAllTask(pageable);
+    @GetMapping
+    @Operation(summary = "Получение всех задач c выборкой по автору и исполнителю")
+    public Page<TaskRespDTO> getTasks(@RequestParam(name = "creator", required = false) String creator, @RequestParam(name = "performer", required = false) String performer, @PageableDefault Pageable pageable){
+        return taskService.findTasks(creator, performer, pageable);
     }
 
     @GetMapping("/{task}")
