@@ -1,0 +1,1 @@
+CREATE DATABASE tasks-app_logs;

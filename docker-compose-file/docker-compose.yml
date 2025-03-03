@@ -1,0 +1,38 @@
+services:
+  backend:
+    image: backend:0.0.1
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "8181:8181"
+    depends_on:
+      - db
+    environment:
+      - SERVER_PORT= 8181
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db/tasks-app
+
+  db:
+    image: postgres:12.12-alpine
+    ports:
+      - "9876:5432"
+    volumes:
+      - /home/user/pgdata_ci:/var/lib/postgresql/data
+      - ./sql/create_database_tasks-app_logs.sql:/docker-entrypoint-initdb.d/create_database_tasks-app_logs.sql
+    environment:
+      POSTGRES_USER: venyaka
+      POSTGRES_PASSWORD: venyaka
+      POSTGRES_DB: tasks-app
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    container_name: db
+    restart: always
+
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
