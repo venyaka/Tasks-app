@@ -1,1 +1,1 @@
-CREATE DATABASE tasks-app_logs;
+CREATE DATABASE tasksApp_logs;
