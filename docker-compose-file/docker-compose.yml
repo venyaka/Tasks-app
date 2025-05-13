@@ -2,7 +2,7 @@ name: "tasks-app"
 
 services:
   backend:
-    image: backend:0.0.1
+    image: backend:0.0.2
     build:
       context: ..
       dockerfile: Dockerfile
