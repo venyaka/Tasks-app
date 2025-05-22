@@ -2,6 +2,7 @@ package veniamin.tasksapp.backend.exception.errors;
 
 public enum NotFoundError {
     USER_NOT_FOUND("Пользователь не был найден"),
+    TASK_NOT_FOUND("Задача не была найдена"),
 
     COURSE_NOT_FOUND("Курс не найден"),
     THEME_IN_COURSE_NOT_FOUND("Тема в данном курсе не найдена"),

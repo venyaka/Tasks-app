@@ -8,13 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import veniamin.tasksapp.backend.constant.PathConstants;
 import veniamin.tasksapp.backend.dto.request.task.*;
 import veniamin.tasksapp.backend.dto.response.TaskRespDTO;
-import veniamin.tasksapp.backend.entity.Task;
 import veniamin.tasksapp.backend.service.TaskService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,39 +20,54 @@ public class TaskController {
 
     private final TaskService taskService;
 
-    @PostMapping("/new")
-    @Operation(summary = "Создание новой задачи, досуп имеет только admin")
-    public void createTask(@Valid @RequestBody TaskCreateReqDTO createTaskDTO, HttpServletRequest request){
-        taskService.createTask(createTaskDTO, request);
-    }
-
-    @PatchMapping("/edit")
-    @Operation(summary = "Редактирование существующей задачи, досуп имеет только admin")
-    public void updateTask(@Valid @RequestBody TaskUpdateReqDTO updateTaskDTO, HttpServletRequest request){
-        taskService.updateTask(updateTaskDTO, request);
-    }
-
-    @PatchMapping("/edit-status")
-    @Operation(summary = "Редактирование статуса задачи, досуп имеет как admin так и пользователь")
-    public void updateTaskStatus(@Valid @RequestBody TaskStatusChangeReqDTO updateTaskStatusDTO, HttpServletRequest request){
-        taskService.updateTaskStatus(updateTaskStatusDTO, request);
-    }
-
-    @PatchMapping("/edit-comment")
-    @Operation(summary = "Редактирование комментария к задаче, досуп имеет как admin так и пользователь")
-    public void updateTaskComment(@Valid @RequestBody TaskCommentChangeReqDTO updateTaskCommentDTO, HttpServletRequest request){
-        taskService.updateTaskComment(updateTaskCommentDTO, request);
-    }
-
     @GetMapping
     @Operation(summary = "Получение всех задач c выборкой по автору и исполнителю")
-    public Page<TaskRespDTO> getTasks(@RequestParam(name = "creator", required = false) String creator, @RequestParam(name = "performer", required = false) String performer, @PageableDefault Pageable pageable){
-        return taskService.findTasks(creator, performer, pageable);
+    public Page<TaskRespDTO> getAllTask(@PageableDefault Pageable pageable){
+        return taskService.findAllTasksForCurrentUser(pageable);
     }
 
-    @GetMapping("/{task}")
-    @Operation(summary = "Получение одной задачи по id")
-    public List<Task> getTask(@PathVariable("task") Long amount, HttpServletRequest request){
-        return taskService.getTask(amount, request);
+//    @GetMapping
+//    @Operation(summary = "Получение всех задач")
+//    public Page<TaskRespDTO> getAllTask(@PageableDefault Pageable pageable){
+//        return taskService.findTasks(pageable);
+//    }
+
+
+    @PostMapping
+    @Operation(summary = "Создание новой задачи, досуп имеет только admin")
+    public void save(@Valid @RequestBody TaskCreateReqDTO createTaskDTO){
+        taskService.save(createTaskDTO);
     }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Получение одной задачи по id")
+    public TaskRespDTO findById(@PathVariable("id") Long id){
+        return taskService.findByIdForCurrentUser(id);
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Редактирование существующей задачи, досуп имеет только admin")
+    public TaskRespDTO updateTask(@PathVariable("id") Long id, @Valid @RequestBody TaskUpdateReqDTO updateTaskDTO){
+        return taskService.update(updateTaskDTO, id);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Удаление существующей задачи, досуп имеет только admin")
+    public void deleteById(@PathVariable("id") Long id){
+        taskService.deleteById(id);
+    }
+
+    @PatchMapping("/{id}")
+    @Operation(summary = "Редактирование существующей задачи, досуп имеет только admin")
+    public TaskRespDTO updateById(@PathVariable("id") Long id, @Valid @RequestBody TaskUpdateReqDTO updateTaskDTO){
+        return taskService.update(updateTaskDTO, id);
+    }
+
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "Изменение статуса задачи")
+    public void updateStatusById(@PathVariable("id") Long id, @Valid @RequestBody Boolean status){
+        taskService.updateStatus(id, status);
+    }
+
+
 }

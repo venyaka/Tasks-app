@@ -9,9 +9,6 @@ import java.time.LocalDate;
 public class TaskUpdateReqDTO {
 
     @NotBlank
-    private Long id;
-
-    @NotBlank
     private String title;
 
     private String details;

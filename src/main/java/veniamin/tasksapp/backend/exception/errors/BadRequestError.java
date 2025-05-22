@@ -2,7 +2,7 @@ package veniamin.tasksapp.backend.exception.errors;
 
 public enum BadRequestError {
 
-
+    TASK_NOT_BELONG_TO_THIS_USER("Курс не принадлежит данному пользователю"),
     NOT_CORRECT_PASSWORD("Неверный пароль"),
     ORDER_ALREADY_EXIST("Заказ уже был создан"),
     NOT_CORRECT_OLD_PASSWORD("Неверный старый пароль для изменения данных"),

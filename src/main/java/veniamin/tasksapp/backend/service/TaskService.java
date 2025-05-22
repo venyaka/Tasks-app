@@ -12,15 +12,22 @@ import java.util.List;
 
 public interface TaskService {
 
-    void createTask(@Valid TaskCreateReqDTO createTaskDTO, HttpServletRequest request);
+    TaskRespDTO save(@Valid TaskCreateReqDTO createTaskDTO);
 
-    void updateTask(@Valid TaskUpdateReqDTO updateTaskDTO, HttpServletRequest request);
+    TaskRespDTO update(@Valid TaskUpdateReqDTO updateTaskDTO, Long taskId);
 
-    void updateTaskStatus(@Valid TaskStatusChangeReqDTO updateTaskStatusDTO, HttpServletRequest request);
+    void deleteById(Long taskId);
 
-    void updateTaskComment(@Valid TaskCommentChangeReqDTO updateTaskCommentDTO, HttpServletRequest request);
+    Page<TaskRespDTO> findAll(Pageable pageable);
 
-    Page<TaskRespDTO> findTasks(String creator, String performer, Pageable pageable);
+    Page<TaskRespDTO> findAllTasksForCurrentUser(Pageable pageable);
 
-    List<Task> getTask(Long amount, HttpServletRequest request);
+    TaskRespDTO findById(Long taskId);
+
+    TaskRespDTO findByIdForCurrentUser(Long taskId);
+
+    void updateStatus(Long taskId, Boolean status);
+
+    TaskRespDTO getRespDTO(Task task);
+
 }

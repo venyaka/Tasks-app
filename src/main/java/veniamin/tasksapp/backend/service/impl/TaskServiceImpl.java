@@ -9,16 +9,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 //import veniamin.tasksapp.backend.configuration.mapstruct.TaskToTaskRespDTO;
 import veniamin.tasksapp.backend.configuration.mapstruct.TaskToTaskRespDTO;
 import veniamin.tasksapp.backend.dto.request.task.*;
 import veniamin.tasksapp.backend.dto.response.TaskRespDTO;
+import veniamin.tasksapp.backend.entity.Role;
 import veniamin.tasksapp.backend.entity.Task;
 import veniamin.tasksapp.backend.entity.User;
+import veniamin.tasksapp.backend.exception.BadRequestException;
 import veniamin.tasksapp.backend.exception.NotFoundException;
 import veniamin.tasksapp.backend.exception.errors.AuthorizedError;
+import veniamin.tasksapp.backend.exception.errors.BadRequestError;
 import veniamin.tasksapp.backend.exception.errors.NotFoundError;
 import veniamin.tasksapp.backend.repository.TaskRepository;
 import veniamin.tasksapp.backend.repository.UserRepository;
@@ -39,12 +43,13 @@ public class TaskServiceImpl implements TaskService {
     private final LogsUtils logsUtils;
 
     private static final Logger loggerAuth = LoggerFactory.getLogger("authLogger");
+    private static final Logger taskLogger = LoggerFactory.getLogger("taskLogger");
 
     private final TaskToTaskRespDTO taskToTaskRespDTO;
 
     @Override
     @Transactional
-    public void createTask(TaskCreateReqDTO createTaskDTO, HttpServletRequest request) {
+    public TaskRespDTO save(TaskCreateReqDTO createTaskDTO) {
         User creator = getCurrentUser();
 
         Optional<User> optionalPerformer = userRepository.findByEmail(createTaskDTO.getPerformerEmail());
@@ -65,13 +70,14 @@ public class TaskServiceImpl implements TaskService {
         task.setCreator(creator);
         taskRepository.save(task);
 
-        logsUtils.log(loggerAuth, "Create task - " + createTaskDTO.getTitle());
+        logsUtils.log(taskLogger, "Create task - " + createTaskDTO.getTitle());
+        return getRespDTO(task);
     }
 
     @Override
-    public void updateTask(TaskUpdateReqDTO updateTaskDTO, HttpServletRequest request) {
+    public TaskRespDTO update(TaskUpdateReqDTO updateTaskDTO, Long taskId) {
 
-        Optional<Task> optionalTask = taskRepository.findById(updateTaskDTO.getId());
+        Optional<Task> optionalTask = taskRepository.findById(taskId);
         if (optionalTask.isEmpty()) {
             throw new BadCredentialsException(AuthorizedError.TASK_NOT_FOUND.getMessage());
         }
@@ -95,46 +101,43 @@ public class TaskServiceImpl implements TaskService {
 
         taskRepository.save(task);
 
-        logsUtils.log(loggerAuth, "Create task - " + updateTaskDTO.getTitle());
+        logsUtils.log(taskLogger, "Update task - " + updateTaskDTO.getTitle());
+
+        return getRespDTO(task);
     }
 
     @Override
-    public void updateTaskStatus(TaskStatusChangeReqDTO updateTaskStatusDTO, HttpServletRequest request) {
+    public void updateStatus(Long taskId, Boolean status) {
 
-        Optional<Task> optionalTask = taskRepository.findById(updateTaskStatusDTO.getId());
+        Optional<Task> optionalTask = taskRepository.findById(taskId);
         if (optionalTask.isEmpty()) {
             throw new BadCredentialsException(AuthorizedError.TASK_NOT_FOUND.getMessage());
         }
 
         Task task = optionalTask.get();
-        task.setIsComplete(updateTaskStatusDTO.getIsComplete());
+        task.setIsComplete(status);
         taskRepository.save(task);
 
-        logsUtils.log(loggerAuth, "Update status task - " + updateTaskStatusDTO.getIsComplete());
+        logsUtils.log(taskLogger, "Update status task - " + task.getIsComplete());
     }
 
+
     @Override
-    public void updateTaskComment(TaskCommentChangeReqDTO updateTaskCommentDTO, HttpServletRequest request) {
-
-        Optional<Task> optionalTask = taskRepository.findById(updateTaskCommentDTO.getId());
-        if (optionalTask.isEmpty()) {
-            throw new BadCredentialsException(AuthorizedError.TASK_NOT_FOUND.getMessage());
+    @Transactional
+    public void deleteById(Long courseId) {
+        Task task = taskRepository.findById(courseId).orElseThrow(() -> new NotFoundException(NotFoundError.TASK_NOT_FOUND));
+        if (!isAvailable(task)) {
+            throw new BadRequestException(BadRequestError.TASK_NOT_BELONG_TO_THIS_USER);
         }
-
-        if (updateTaskCommentDTO.getComment() != null) {
-            Task task = optionalTask.get();
-            task.setComment(updateTaskCommentDTO.getComment());
-            taskRepository.save(task);
-        }
-
-        logsUtils.log(loggerAuth, "Update comment task - " + updateTaskCommentDTO.getComment());
+        taskRepository.delete(task);
+        logsUtils.log(taskLogger, "Delete course (id " + courseId + ")");
     }
 
     @Override
     @Transactional
-    public Page<TaskRespDTO> findTasks(String creator, String performer, Pageable pageable) {
+    public Page<TaskRespDTO> findAll(Pageable pageable) {
         List<Task> tasks = taskRepository.findAll()
-                .stream().filter(m -> (m.getPerformer().getEmail().equals(performer) || performer == null) && (m.getCreator().getEmail().equals(creator) || creator == null)).toList();
+                .stream().toList();
 
         Page<Task> page = new PageImpl<>(tasks, pageable, tasks.size());
 
@@ -142,8 +145,65 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getTask(Long amount, HttpServletRequest request) {
-        return taskRepository.findAll();
+    @Transactional
+    public Page<TaskRespDTO> findAllTasksForCurrentUser(Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = authentication.getName().equals("anonymousUser") ? new User() : userRepository.findByEmail(authentication.getName()).get();
+
+        List<Task> tasks = taskRepository.findAll()
+                .stream().filter(m -> m.getPerformer().getEmail().equals(user.getEmail()) || m.getCreator().getEmail().equals(user.getEmail())).toList();
+
+        Page<Task> page = new PageImpl<>(tasks, pageable, tasks.size());
+
+        return page.map(taskToTaskRespDTO::sourceToDestination);
+    }
+
+    @Override
+    @Transactional
+    public TaskRespDTO findByIdForCurrentUser(Long taskId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NotFoundException(NotFoundError.TASK_NOT_FOUND));
+        User user = getCurrentUser();
+        if (!task.getPerformer().getEmail().equals(user.getEmail()) && !task.getCreator().getEmail().equals(user.getEmail())) {
+            throw new NotFoundException(NotFoundError.TASK_NOT_FOUND);
+        }
+
+        return getRespDTO(task);
+    }
+
+    @Override
+    @Transactional
+    public TaskRespDTO findById(Long taskId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NotFoundException(NotFoundError.TASK_NOT_FOUND));
+
+        return getRespDTO(task);
+    }
+
+    private boolean isAvailable(Task course) {
+        User user = getCurrentUser();
+
+        boolean isAdmin = user.getRoles().contains(Role.ADMIN);
+
+        if (isAdmin) return true;
+
+        return false;
+    }
+
+    @Override
+    public TaskRespDTO getRespDTO(Task task) {
+        TaskRespDTO taskRespDTO = new TaskRespDTO();
+        taskRespDTO.setComment(task.getComment());
+        taskRespDTO.setId(task.getId());
+        taskRespDTO.setDate(task.getDate());
+        taskRespDTO.setDetails(task.getDetails());
+        taskRespDTO.setPriority(task.getPriority());
+        taskRespDTO.setIsComplete(task.getIsComplete());
+        taskRespDTO.setCreatorEmail(task.getCreator().getEmail());
+        taskRespDTO.setPerformerEmail(task.getPerformer().getEmail());
+        taskRespDTO.setTitle(task.getTitle());
+
+        return taskRespDTO;
     }
 
     @Transactional
